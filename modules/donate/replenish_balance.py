@@ -30,7 +30,7 @@ async def get_user_data(user_id: int) -> dict:
 async def donate_handler(message: Message):
     await show_donate_menu(message)
 
-@router.message(F.text == "🎁 Донат")
+
 async def show_donate_menu(message: Message):
     kb = InlineKeyboardBuilder()
     

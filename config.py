@@ -25,6 +25,29 @@ OWNER_ID = int(os.getenv("OWNER_ID", "0"))
 SUPPORT_CHAT_URL = os.getenv("SUPPORT_CHAT_URL", "")
 UPDATES_CHANNEL_URL = os.getenv("UPDATES_CHANNEL_URL", "")
 
+
+def _parse_admin_ids(value: str) -> list[int]:
+    """Преобразует строку вида "1,2,3" в список идентификаторов админов."""
+
+    if not value:
+        return []
+
+    ids: list[int] = []
+    for raw in value.split(","):
+        raw = raw.strip()
+        if not raw:
+            continue
+        try:
+            ids.append(int(raw))
+        except ValueError:
+            logger.warning("Некорректный ADMIN_ID '%s' пропущен", raw)
+    return ids
+
+
+ADMIN_IDS = _parse_admin_ids(os.getenv("ADMIN_IDS", ""))
+LOG_ID = int(os.getenv("LOG_ID", "0") or 0)
+STARS = os.getenv("STARS", "XTR")
+
 # Проверка обязательных переменных
 REQUIRED_VARS = {
     "BOT_TOKEN": BOT_TOKEN,
@@ -36,6 +59,12 @@ REQUIRED_VARS = {
 for var, value in REQUIRED_VARS.items():
     if not value:
         raise ValueError(f"❌ Переменная окружения {var} не установлена!")
+
+if not ADMIN_IDS:
+    logger.warning("Список администраторов пуст. Установите переменную окружения ADMIN_IDS.")
+
+if not LOG_ID:
+    logger.warning("LOG_ID не задан. Жалобы пользователей не будут отправляться в лог-чат.")
 
 # Инициализация бота
 bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
